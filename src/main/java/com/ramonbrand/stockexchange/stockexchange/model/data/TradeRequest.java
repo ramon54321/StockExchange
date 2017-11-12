@@ -1,4 +1,4 @@
-package com.ramonbrand.stockexchange.stockexchange.data;
+package com.ramonbrand.stockexchange.stockexchange.model.data;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

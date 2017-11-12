@@ -1,76 +1,31 @@
 package com.ramonbrand.stockexchange.stockexchange.model;
 
-import com.ramonbrand.stockexchange.stockexchange.data.*;
+import com.ramonbrand.stockexchange.stockexchange.model.data.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.Date;
+import java.util.List;
 
-@RestController
+@Service
 public class Matcher {
 
-    public static Random random = new Random(); // Testing random
-
     @Autowired
-    CommodityRepository commodityRepository;
-
-    @RequestMapping("/add")
-    public String apiAdd() {
-        Commodity commodity = new Commodity();
-        commodity.name = "Oil";
-        commodity.value = 1.553881;
-        commodity.testData.add(3.112);
-        commodity.testData.add(3.114);
-        commodity.testData.add(3.121);
-        commodity.testData.add(3.129);
-        commodity.testData.add(3.123);
-        commodity.testData.add(3.101);
-        commodity.testData.add(3.007);
-        commodity.testData.add(3.001);
-        commodityRepository.save(commodity);
-        return "added.";
-    }
-
-    @RequestMapping("/listvalues")
-    public String apiListValues() {
-
-        Commodity oil = commodityRepository.findOne(1l);
-
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("<ul>");
-        for (int i = 0; i < oil.testData.size(); i++) {
-            stringBuilder.append("<li>");
-            stringBuilder.append(oil.testData.get(i).doubleValue());
-            stringBuilder.append("</li>");
-        }
-        stringBuilder.append("</ul>");
-
-        return stringBuilder.toString();
-    }
-
-    @RequestMapping("/match")
-    public String apiMatch() {
-        //findMatch(3);
-        return "Matcher ran.";
-    }
+    private CommodityRepository commodityRepository;
+    @Autowired
+    private TradeRequestRepository tradeRequestRepository;
+    @Autowired
+    private ExchangeRepository exchangeRepository;
 
     /**
      * Takes id of request to try match. The request is tested against all other requests of the opposite direction.
      * @param idToMatch
      */
-    public static void findMatch(long idToMatch){
+    public void findMatch(long idToMatch){
 
-        TradeRequest requestToMatchTo = new TradeRequest();
-        requestToMatchTo.id = random.nextInt(1000000);
-        requestToMatchTo.tradeRequestType = TradeRequestType.SELL;
-        requestToMatchTo.commodityId = 1;
-        requestToMatchTo.quantity = 5;
-        requestToMatchTo.price = 1.20;
-        requestToMatchTo.address = "laura's client";
-        requestToMatchTo.ownerId = 60;
-        TradeRequest tradeRequest = requestToMatchTo; // -- This will be the db get with the idToMatch
+        TradeRequest tradeRequest = tradeRequestRepository.findOne(idToMatch);
 
         if(tradeRequest.tradeRequestType == TradeRequestType.BUY){
             // -- Find a sell to match the buy
@@ -80,61 +35,46 @@ public class Matcher {
             // -- The commodity must be the same;
             long commodityId = tradeRequest.commodityId;
 
-            ArrayList<TradeRequest> matchedRequests = new ArrayList<TradeRequest>(); // -- This will be search results
+            List<TradeRequest> matchedRequests = tradeRequestRepository.getSells(maxPrice);// new ArrayList<TradeRequest>(); // -- This will be search results
 
-            // -- Temp fake data
-            TradeRequest match1 = new TradeRequest();
-            match1.id = random.nextInt(1000000);
-            match1.tradeRequestType = TradeRequestType.SELL;
-            match1.commodityId = 1;
-            match1.quantity = 1;
-            match1.price = 1.25;
-            match1.address = "bob's client";
-            match1.ownerId = 50;
-            matchedRequests.add(match1);
-            TradeRequest match2 = new TradeRequest();
-            match2.id = random.nextInt(1000000);
-            match2.tradeRequestType = TradeRequestType.SELL;
-            match2.commodityId = 1;
-            match2.quantity = 2;
-            match2.price = 1.29;
-            match2.address = "bob's client";
-            match2.ownerId = 51;
-            matchedRequests.add(match2);
-            TradeRequest match3 = new TradeRequest();
-            match3.id = random.nextInt(1000000);
-            match3.tradeRequestType = TradeRequestType.SELL;
-            match3.commodityId = 1;
-            match3.quantity = 8;
-            match3.price = 1.22;
-            match3.address = "bob's client";
-            match3.ownerId = 56;
-            matchedRequests.add(match3);
+            System.out.println(matchedRequests.size() + " records in TradeRequests.");
+
+            if(matchedRequests.size() == 0) {
+                System.out.println("No possible matches. Request remains in pool.");
+                return;
+            }
 
             int matchIndex = 0;
-            while(requestToMatchTo.quantity > 0) {
+            while(tradeRequest.quantity > 0) {
+                if(matchedRequests.size() <= matchIndex) {
+                    System.out.println("Ran out of possible matches, trade not entirely fulfilled.");
+                    break;
+                }
+
                 TradeRequest match = matchedRequests.get(matchIndex);
                 matchIndex++;
 
                 // -- Check if match has enough to fulfill buy
-                if (match.quantity >= requestToMatchTo.quantity) {
+                if (match.quantity >= tradeRequest.quantity) {
                     System.out.println(" --- Last Exchange to satisfy match ---");
                     // -- Calculate quantity to transfer
-                    long quantity = requestToMatchTo.quantity;
+                    long quantity = tradeRequest.quantity;
 
                     // -- Create new exchange data
                     Exchange exchange = new Exchange();
-                    exchange.commodityId = requestToMatchTo.commodityId;
+                    exchange.commodityId = tradeRequest.commodityId;
                     exchange.quantity = quantity;
-                    exchange.price = match.price;
+                    exchange.price = tradeRequest.price;
+                    exchange.date = new Date();
                     exchange.ownerIdSell = match.ownerId;
-                    exchange.ownerIdBuy = requestToMatchTo.ownerId;
+                    exchange.ownerIdBuy = tradeRequest.ownerId;
 
-                    // Log exchange
+                    // -- Log exchange
                     System.out.println("Logging Exchange: " + exchange);
+                    exchangeRepository.save(exchange);
 
                     // -- Decrement request quantity
-                    requestToMatchTo.quantity -= quantity;
+                    tradeRequest.quantity -= quantity;
                     match.quantity -= quantity;
 
                     // ------ Transfer
@@ -150,17 +90,19 @@ public class Matcher {
 
                     // -- Create new exchange data
                     Exchange exchange = new Exchange();
-                    exchange.commodityId = requestToMatchTo.commodityId;
+                    exchange.commodityId = tradeRequest.commodityId;
                     exchange.quantity = quantity;
-                    exchange.price = match.price;
+                    exchange.price = tradeRequest.price;
+                    exchange.date = new Date();
                     exchange.ownerIdSell = match.ownerId;
-                    exchange.ownerIdBuy = requestToMatchTo.ownerId;
+                    exchange.ownerIdBuy = tradeRequest.ownerId;
 
-                    // Log exchange
+                    // -- Log exchange
                     System.out.println("Logging Exchange: " + exchange);
+                    exchangeRepository.save(exchange);
 
                     // -- Decrement request quantity
-                    requestToMatchTo.quantity -= quantity;
+                    tradeRequest.quantity -= quantity;
                     match.quantity -= quantity;
 
                     // ------ Transfer
@@ -170,20 +112,24 @@ public class Matcher {
                     // ---------------
                 }
 
-                if(requestToMatchTo.quantity == 0){
+                if(tradeRequest.quantity == 0){
                     // Delete request record
                     System.out.println("Deleting requestToMatchTo");
+                    tradeRequestRepository.delete(tradeRequest);
                 } else {
                     // Update request record
                     System.out.println("Updating requestToMatchTo");
+                    tradeRequestRepository.save(tradeRequest);
                 }
 
                 if(match.quantity == 0){
                     // Delete match record
                     System.out.println("Deleting match");
+                    tradeRequestRepository.delete(match);
                 } else {
                     // Update request record
                     System.out.println("Updating match");
+                    tradeRequestRepository.save(match);
                 }
             }
 
@@ -195,61 +141,46 @@ public class Matcher {
             // -- The commodity must be the same;
             long commodityId = tradeRequest.commodityId;
 
-            ArrayList<TradeRequest> matchedRequests = new ArrayList<TradeRequest>(); // -- This will be search results
+            List<TradeRequest> matchedRequests = tradeRequestRepository.getBuys(minPrice);// new ArrayList<TradeRequest>(); // -- This will be search results
 
-            // -- Temp fake data
-            TradeRequest match1 = new TradeRequest();
-            match1.id = random.nextInt(1000000);
-            match1.tradeRequestType = TradeRequestType.BUY;
-            match1.commodityId = 1;
-            match1.quantity = 1;
-            match1.price = 1.22;
-            match1.address = "bob's client";
-            match1.ownerId = 50;
-            matchedRequests.add(match1);
-            TradeRequest match2 = new TradeRequest();
-            match2.id = random.nextInt(1000000);
-            match2.tradeRequestType = TradeRequestType.BUY;
-            match2.commodityId = 1;
-            match2.quantity = 2;
-            match2.price = 1.23;
-            match2.address = "bob's client";
-            match2.ownerId = 51;
-            matchedRequests.add(match2);
-            TradeRequest match3 = new TradeRequest();
-            match3.id = random.nextInt(1000000);
-            match3.tradeRequestType = TradeRequestType.BUY;
-            match3.commodityId = 1;
-            match3.quantity = 8;
-            match3.price = 1.26;
-            match3.address = "bob's client";
-            match3.ownerId = 56;
-            matchedRequests.add(match3);
+            System.out.println(matchedRequests.size() + " records in TradeRequests.");
+
+            if(matchedRequests.size() == 0) {
+                System.out.println("No possible matches. Request remains in pool.");
+                return;
+            }
 
             int matchIndex = 0;
-            while(requestToMatchTo.quantity > 0) {
+            while(tradeRequest.quantity > 0) {
+                if(matchedRequests.size() <= matchIndex) {
+                    System.out.println("Ran out of possible matches, trade not entirely fulfilled.");
+                    break;
+                }
+
                 TradeRequest match = matchedRequests.get(matchIndex);
                 matchIndex++;
 
                 // -- Check if match has enough to fulfill buy
-                if (match.quantity >= requestToMatchTo.quantity) {
+                if (match.quantity >= tradeRequest.quantity) {
                     System.out.println(" --- Last Exchange to satisfy match ---");
                     // -- Calculate quantity to transfer
-                    long quantity = requestToMatchTo.quantity;
+                    long quantity = tradeRequest.quantity;
 
                     // -- Create new exchange data
                     Exchange exchange = new Exchange();
-                    exchange.commodityId = requestToMatchTo.commodityId;
+                    exchange.commodityId = tradeRequest.commodityId;
                     exchange.quantity = quantity;
-                    exchange.price = match.price;
-                    exchange.ownerIdSell = requestToMatchTo.ownerId;
+                    exchange.price = tradeRequest.price;
+                    exchange.date = new Date();
+                    exchange.ownerIdSell = tradeRequest.ownerId;
                     exchange.ownerIdBuy = match.ownerId;
 
-                    // Log exchange
+                    // -- Log exchange
                     System.out.println("Logging Exchange: " + exchange);
+                    exchangeRepository.save(exchange);
 
                     // -- Decrement request quantity
-                    requestToMatchTo.quantity -= quantity;
+                    tradeRequest.quantity -= quantity;
                     match.quantity -= quantity;
 
                     // ------ Transfer
@@ -265,17 +196,19 @@ public class Matcher {
 
                     // -- Create new exchange data
                     Exchange exchange = new Exchange();
-                    exchange.commodityId = requestToMatchTo.commodityId;
+                    exchange.commodityId = tradeRequest.commodityId;
                     exchange.quantity = quantity;
-                    exchange.price = match.price;
-                    exchange.ownerIdSell = requestToMatchTo.ownerId;
+                    exchange.price = tradeRequest.price;
+                    exchange.date = new Date();
+                    exchange.ownerIdSell = tradeRequest.ownerId;
                     exchange.ownerIdBuy = match.ownerId;
 
-                    // Log exchange
+                    // -- Log exchange
                     System.out.println("Logging Exchange: " + exchange);
+                    exchangeRepository.save(exchange);
 
                     // -- Decrement request quantity
-                    requestToMatchTo.quantity -= quantity;
+                    tradeRequest.quantity -= quantity;
                     match.quantity -= quantity;
 
                     // ------ Transfer
@@ -285,23 +218,26 @@ public class Matcher {
                     // ---------------
                 }
 
-                if(requestToMatchTo.quantity == 0){
+                if(tradeRequest.quantity == 0){
                     // Delete request record
                     System.out.println("Deleting requestToMatchTo");
+                    tradeRequestRepository.delete(tradeRequest);
                 } else {
                     // Update request record
                     System.out.println("Updating requestToMatchTo");
+                    tradeRequestRepository.save(tradeRequest);
                 }
 
                 if(match.quantity == 0){
                     // Delete match record
                     System.out.println("Deleting match");
+                    tradeRequestRepository.delete(match);
                 } else {
                     // Update request record
                     System.out.println("Updating match");
+                    tradeRequestRepository.save(match);
                 }
             }
         }
     }
-
 }

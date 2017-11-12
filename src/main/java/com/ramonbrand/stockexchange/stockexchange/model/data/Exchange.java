@@ -1,9 +1,10 @@
-package com.ramonbrand.stockexchange.stockexchange.data;
+package com.ramonbrand.stockexchange.stockexchange.model.data;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.util.Date;
 
 @Entity
 public class Exchange {
@@ -13,6 +14,7 @@ public class Exchange {
     public long commodityId;
     public long quantity;
     public double price;
+    public Date date;
     public long ownerIdSell;
     public long ownerIdBuy;
 

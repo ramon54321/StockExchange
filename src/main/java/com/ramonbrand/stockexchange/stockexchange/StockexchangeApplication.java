@@ -1,6 +1,5 @@
 package com.ramonbrand.stockexchange.stockexchange;
 
-import com.ramonbrand.stockexchange.stockexchange.model.Matcher;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
