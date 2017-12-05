@@ -1,12 +1,11 @@
 package com.ramonbrand.stockexchange.stockexchange.controller;
 
 import com.ramonbrand.stockexchange.stockexchange.model.Matcher;
+import com.ramonbrand.stockexchange.stockexchange.model.TokenVerification;
 import com.ramonbrand.stockexchange.stockexchange.model.data.*;
+import jdk.nashorn.internal.parser.Token;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -29,8 +28,12 @@ public class ApiTrade {
             HttpServletRequest request,
             @PathVariable("comId") long comId,
             @PathVariable("price") double price,
-            @PathVariable("qty") long qty
+            @PathVariable("qty") long qty,
+            @RequestHeader(value="apiToken") String token
     ) {
+        // -- Verify token
+        if(!TokenVerification.verifyToken(token))
+            return "invalid token";
 
         // -- Create new trade request
         TradeRequest newRequest = new TradeRequest();
@@ -39,7 +42,7 @@ public class ApiTrade {
         newRequest.quantity = qty;
         newRequest.price = price;
         newRequest.address = "laura's client";
-        newRequest.ownerId = 60;
+        newRequest.ownerId = 1;
 
         // -- Save request to db
         tradeRequestRepository.save(newRequest);
@@ -56,8 +59,12 @@ public class ApiTrade {
             HttpServletRequest request,
             @PathVariable("comId") long comId,
             @PathVariable("price") double price,
-            @PathVariable("qty") long qty
+            @PathVariable("qty") long qty,
+            @RequestHeader(value="apiToken") String token
     ) {
+        // -- Verify token
+        if(!TokenVerification.verifyToken(token))
+            return "invalid token";
 
         // -- Create new trade request
         TradeRequest newRequest = new TradeRequest();
@@ -66,7 +73,7 @@ public class ApiTrade {
         newRequest.quantity = qty;
         newRequest.price = price;
         newRequest.address = "laura's client";
-        newRequest.ownerId = 60;
+        newRequest.ownerId = 1;
 
         // -- Save request to db
         tradeRequestRepository.save(newRequest);

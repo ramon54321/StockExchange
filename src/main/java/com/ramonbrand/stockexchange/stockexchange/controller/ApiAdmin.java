@@ -1,9 +1,6 @@
 package com.ramonbrand.stockexchange.stockexchange.controller;
 
-import com.ramonbrand.stockexchange.stockexchange.model.data.Commodity;
-import com.ramonbrand.stockexchange.stockexchange.model.data.CommodityRepository;
-import com.ramonbrand.stockexchange.stockexchange.model.data.ExchangeRepository;
-import com.ramonbrand.stockexchange.stockexchange.model.data.TradeRequestRepository;
+import com.ramonbrand.stockexchange.stockexchange.model.data.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,6 +18,8 @@ public class ApiAdmin {
     private ExchangeRepository exchangeRepository;
     @Autowired
     private TradeRequestRepository tradeRequestRepository;
+    @Autowired
+    private IndividualRepository individualRepository;
 
     @RequestMapping("/api/admin/init")
     public String apiAdminInit(
@@ -44,6 +43,19 @@ public class ApiAdmin {
         commodityRepository.save(gold);
         commodityRepository.save(silver);
         commodityRepository.save(oil);
+
+        // -- Init Individuals
+        individualRepository.deleteAll();
+
+        Individual individualA = new Individual();
+        individualA.id = 1;
+        individualRepository.save(individualA);
+
+        // -- Init Exchanges
+        exchangeRepository.deleteAll();
+
+        // -- Init TradeRequests
+        tradeRequestRepository.deleteAll();
 
         return "Initialized";
     }

@@ -45,9 +45,10 @@ public class ApiData {
     }
 
     @CrossOrigin
-    @RequestMapping("/api/data/commodities/test/{mingap}")
+    @RequestMapping("/api/data/commodities/{comId}/{mingap}")
     public OHLCPojo apiDataListCommoditiesTest(
             HttpServletRequest request,
+            @PathVariable("comId") long comId,
             @PathVariable("mingap") long mingap
     ) {
         EntityManager entityManager = emf.createEntityManager();
