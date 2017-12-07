@@ -57,12 +57,12 @@ public class ApiData {
         String queryString = "select e1.timeslot, e1.min_p min_price, e1.max_p max_price, e2.price first_price, e3.price last_price " +
                 "from (" +
                 "select " +
-                "date_trunc('hour', ei.date) + date_part('minute', ei.date)\\:\\:int / 15 * interval '15 min' " +
+                "date_trunc('hour', ei.date) + date_part('minute', ei.date)\\:\\:int / " + mingap + " * interval '" + mingap + " min' " +
                 " timeslot, min(ei.date) min_date, max(ei.date) max_date, max(ei.price) max_p , min(ei.price) min_p " +
-                "from exchange ei group by timeslot " +
+                "from exchange ei where ei.commodity_id = " + comId + " group by timeslot " +
                 ") e1, exchange e2, exchange e3 " +
                 "where e2.date = e1.min_date " +
-                "and e3.date = e1.max_date" +
+                "and e3.date = e1.max_date " +
                 ";";
 
         Query query = entityManager.createNativeQuery(queryString);

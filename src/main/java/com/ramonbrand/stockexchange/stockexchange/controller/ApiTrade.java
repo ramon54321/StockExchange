@@ -41,8 +41,8 @@ public class ApiTrade {
         newRequest.commodityId = comId;
         newRequest.quantity = qty;
         newRequest.price = price;
-        newRequest.address = "laura's client";
-        newRequest.ownerId = 1;
+        newRequest.address = "x";
+        newRequest.ownerId = TokenVerification.getTokenUserId(token);
 
         // -- Save request to db
         tradeRequestRepository.save(newRequest);
@@ -72,8 +72,8 @@ public class ApiTrade {
         newRequest.commodityId = comId;
         newRequest.quantity = qty;
         newRequest.price = price;
-        newRequest.address = "laura's client";
-        newRequest.ownerId = 1;
+        newRequest.address = "x";
+        newRequest.ownerId = TokenVerification.getTokenUserId(token);;
 
         // -- Save request to db
         tradeRequestRepository.save(newRequest);

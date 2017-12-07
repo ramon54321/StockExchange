@@ -12,12 +12,32 @@ public class Individual {
     //@GeneratedValue(strategy = GenerationType.AUTO)
     public long id;
 
-    @ElementCollection
-    @CollectionTable
-    public List<Exchange> exchanges = new ArrayList<>();
+    public String username;
+    public String passwordHash;
 
     //@ElementCollection
-    //@CollectionTable
-    //public Map<Long, Long> exchanges = new HashMap<>();
+    @ManyToMany
+    public List<Exchange> exchanges = new ArrayList<>();
+
+    @ElementCollection
+    public Map<Long, Long> commodityQuantities = new HashMap<>();
+
+    public void addCommodities(long commodityId, long qty) {
+        long currentValue = 0;
+        if(commodityQuantities.containsKey(commodityId)) {
+            currentValue = commodityQuantities.get(commodityId);
+            commodityQuantities.replace(commodityId, currentValue + qty);
+        } else {
+            commodityQuantities.put(commodityId, qty);
+        }
+    }
+
+    public void removeCommodities(long commodityId, long qty) {
+        long currentValue = 0;
+        if(commodityQuantities.containsKey(commodityId)) {
+            currentValue = commodityQuantities.get(commodityId);
+            commodityQuantities.replace(commodityId, Math.max(0 ,currentValue - qty));
+        }
+    }
 
 }

@@ -7,6 +7,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.ramonbrand.stockexchange.stockexchange.model.Matcher;
+import com.ramonbrand.stockexchange.stockexchange.model.PasswordVerification;
 import com.ramonbrand.stockexchange.stockexchange.model.data.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -30,21 +31,26 @@ public class ApiIndividuals {
 
     @CrossOrigin
     @RequestMapping(value = "/api/individuals/login", method = RequestMethod.POST)
-    public String apiIndividualsLogin(
+    public Object apiIndividualsLogin(
             HttpServletRequest request,
             @RequestBody SignInCombo signInCombo
     ) {
         // Check database to see if username and password are correct
-        if(false) {
+        Individual individual = individualRepository.findByUsername(signInCombo.username);
+        if(individual == null)
             return "invalid";
-        }
 
-        int userId = 45;
+        if(!PasswordVerification.getPasswordHash(signInCombo.password).equals(individual.passwordHash))
+            return "invalid";
 
+        int userId = (int) individual.id;
 
         try {
             String token = JWT.create().withIssuer("auth0").withClaim("id", userId).sign(Algorithm.HMAC256("projectbox"));
-            return token;
+            LoggedInPojo loggedInPojo = new LoggedInPojo();
+            loggedInPojo.token = token;
+            loggedInPojo.userId = userId;
+            return loggedInPojo;
         }  catch (UnsupportedEncodingException exception){
             //UTF-8 encoding not supported
             return "invalid";

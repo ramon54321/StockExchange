@@ -72,19 +72,18 @@ public class Matcher {
                     // -- Log exchange
                     System.out.println("Logging Exchange: " + exchange);
                     exchangeRepository.save(exchange);
-                    System.out.println("Here A");
 
                     // -- Add exchange to individuals
                     Individual individualA = individualRepository.findOne(exchange.ownerIdSell);
                     individualA.exchanges.add(exchange);
+                    individualA.removeCommodities(exchange.commodityId, exchange.quantity);
                     individualRepository.save(individualA);
                     Individual individualB = individualRepository.findOne(exchange.ownerIdBuy);
+                    individualB.addCommodities(exchange.commodityId, exchange.quantity);
                     if(individualB != individualA) {
                         individualB.exchanges.add(exchange);
-                        individualRepository.save(individualB);
                     }
-
-                    System.out.println("Here B");
+                    individualRepository.save(individualB);
 
                     // -- Decrement request quantity
                     tradeRequest.quantity -= quantity;
@@ -117,12 +116,14 @@ public class Matcher {
                     // -- Add exchange to individuals
                     Individual individualA = individualRepository.findOne(exchange.ownerIdSell);
                     individualA.exchanges.add(exchange);
+                    individualA.removeCommodities(exchange.commodityId, exchange.quantity);
                     individualRepository.save(individualA);
                     Individual individualB = individualRepository.findOne(exchange.ownerIdBuy);
+                    individualB.addCommodities(exchange.commodityId, exchange.quantity);
                     if(individualB != individualA) {
                         individualB.exchanges.add(exchange);
-                        individualRepository.save(individualB);
                     }
+                    individualRepository.save(individualB);
 
                     // -- Decrement request quantity
                     tradeRequest.quantity -= quantity;
@@ -164,7 +165,7 @@ public class Matcher {
             // -- The commodity must be the same;
             long commodityId = tradeRequest.commodityId;
 
-            List<TradeRequest> matchedRequests = tradeRequestRepository.getBuys(minPrice);// new ArrayList<TradeRequest>(); // -- This will be search results
+            List<TradeRequest> matchedRequests = tradeRequestRepository.getBuys(minPrice);
 
             System.out.println(matchedRequests.size() + " records in TradeRequests.");
 
@@ -205,12 +206,14 @@ public class Matcher {
                     // -- Add exchange to individuals
                     Individual individualA = individualRepository.findOne(exchange.ownerIdSell);
                     individualA.exchanges.add(exchange);
+                    individualA.removeCommodities(exchange.commodityId, exchange.quantity);
                     individualRepository.save(individualA);
                     Individual individualB = individualRepository.findOne(exchange.ownerIdBuy);
+                    individualB.addCommodities(exchange.commodityId, exchange.quantity);
                     if(individualB != individualA) {
                         individualB.exchanges.add(exchange);
-                        individualRepository.save(individualB);
                     }
+                    individualRepository.save(individualB);
 
                     // -- Decrement request quantity
                     tradeRequest.quantity -= quantity;
@@ -243,12 +246,14 @@ public class Matcher {
                     // -- Add exchange to individuals
                     Individual individualA = individualRepository.findOne(exchange.ownerIdSell);
                     individualA.exchanges.add(exchange);
+                    individualA.removeCommodities(exchange.commodityId, exchange.quantity);
                     individualRepository.save(individualA);
                     Individual individualB = individualRepository.findOne(exchange.ownerIdBuy);
+                    individualB.addCommodities(exchange.commodityId, exchange.quantity);
                     if(individualB != individualA) {
                         individualB.exchanges.add(exchange);
-                        individualRepository.save(individualB);
                     }
+                    individualRepository.save(individualB);
 
                     // -- Decrement request quantity
                     tradeRequest.quantity -= quantity;
