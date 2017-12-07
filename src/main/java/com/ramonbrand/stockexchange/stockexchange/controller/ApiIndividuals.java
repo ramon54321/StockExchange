@@ -30,8 +30,8 @@ public class ApiIndividuals {
     @Autowired
     private IndividualRepository individualRepository;
 
-    @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/api/individuals/login", method = RequestMethod.POST)
+    @CrossOrigin
+    @RequestMapping(path = "/api/individuals/login", method = RequestMethod.POST)
     public LoggedInPojo apiIndividualsLogin(
             @RequestBody SignInCombo signInCombo
     ) {
