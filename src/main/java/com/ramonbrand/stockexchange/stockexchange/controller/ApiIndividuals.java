@@ -36,13 +36,16 @@ public class ApiIndividuals {
             HttpServletRequest request,
             @RequestBody SignInCombo signInCombo
     ) {
+        System.out.println("U: " + signInCombo.username);
+        System.out.println("P: " + signInCombo.password);
+        LoggedInPojo blank = new LoggedInPojo();
         // Check database to see if username and password are corre
         Individual individual = individualRepository.findByUsername(signInCombo.username);
         if(individual == null)
-            return null;
+            return blank;
 
         if(!PasswordVerification.getPasswordHash(signInCombo.password).equals(individual.passwordHash))
-            return null;
+            return blank;
 
         int userId = (int) individual.id;
 
@@ -54,10 +57,10 @@ public class ApiIndividuals {
             return loggedInPojo;
         }  catch (UnsupportedEncodingException exception){
             //UTF-8 encoding not supported
-            return null;
+            return blank;
         } catch (JWTVerificationException exception){
             //Invalid signature/claims
-            return null;
+            return blank;
         }
     }
 
