@@ -31,12 +31,12 @@ public class ApiIndividuals {
     private IndividualRepository individualRepository;
 
     @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/api/individuals/login", method = RequestMethod.POST, produces = { MediaType.APPLICATION_JSON_VALUE })
+    @RequestMapping(value = "/api/individuals/login", method = RequestMethod.POST, produces = { MediaType.APPLICATION_JSON_VALUE }, consumes = MediaType.APPLICATION_JSON_VALUE)
     public LoggedInPojo apiIndividualsLogin(
             HttpServletRequest request,
             @RequestBody SignInCombo signInCombo
     ) {
-        // Check database to see if username and password are correct
+        // Check database to see if username and password are corre
         Individual individual = individualRepository.findByUsername(signInCombo.username);
         if(individual == null)
             return null;
