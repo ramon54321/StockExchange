@@ -31,17 +31,17 @@ public class ApiIndividuals {
 
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/api/individuals/login", method = RequestMethod.POST)
-    public Object apiIndividualsLogin(
+    public LoggedInPojo apiIndividualsLogin(
             HttpServletRequest request,
             @RequestBody SignInCombo signInCombo
     ) {
         // Check database to see if username and password are correct
         Individual individual = individualRepository.findByUsername(signInCombo.username);
         if(individual == null)
-            return "invalid";
+            return null;
 
         if(!PasswordVerification.getPasswordHash(signInCombo.password).equals(individual.passwordHash))
-            return "invalid";
+            return null;
 
         int userId = (int) individual.id;
 
@@ -53,10 +53,10 @@ public class ApiIndividuals {
             return loggedInPojo;
         }  catch (UnsupportedEncodingException exception){
             //UTF-8 encoding not supported
-            return "invalid";
+            return null;
         } catch (JWTVerificationException exception){
             //Invalid signature/claims
-            return "invalid";
+            return null;
         }
     }
 
