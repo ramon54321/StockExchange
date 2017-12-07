@@ -27,8 +27,8 @@ public class ApiAdmin {
     @Autowired
     private IndividualRepository individualRepository;
 
-    @CrossOrigin(origins = "*")
-    @RequestMapping("/api/admin/init")
+    @CrossOrigin
+    @RequestMapping(path = "/api/admin/init")
     public String apiAdminInit(
             HttpServletRequest request
     ) {

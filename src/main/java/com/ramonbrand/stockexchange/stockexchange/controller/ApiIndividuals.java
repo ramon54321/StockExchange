@@ -35,16 +35,13 @@ public class ApiIndividuals {
     public LoggedInPojo apiIndividualsLogin(
             @RequestBody SignInCombo signInCombo
     ) {
-        System.out.println("U: " + signInCombo.username);
-        System.out.println("P: " + signInCombo.password);
-        LoggedInPojo blank = new LoggedInPojo();
         // Check database to see if username and password are corre
         Individual individual = individualRepository.findByUsername(signInCombo.username);
         if(individual == null)
-            return blank;
+            return null;
 
         if(!PasswordVerification.getPasswordHash(signInCombo.password).equals(individual.passwordHash))
-            return blank;
+            return null;
 
         int userId = (int) individual.id;
 
@@ -56,15 +53,15 @@ public class ApiIndividuals {
             return loggedInPojo;
         }  catch (UnsupportedEncodingException exception){
             //UTF-8 encoding not supported
-            return blank;
+            return null;
         } catch (JWTVerificationException exception){
             //Invalid signature/claims
-            return blank;
+            return null;
         }
     }
 
-    @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/api/individuals", produces = { MediaType.APPLICATION_JSON_VALUE })
+    @CrossOrigin
+    @RequestMapping(path = "/api/individuals")
     public List<Individual> apiIndividualsLoginGetAll(
             HttpServletRequest request
     ) {
@@ -74,8 +71,8 @@ public class ApiIndividuals {
         return individuals;
     }
 
-    @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/api/individuals/{id}", produces = { MediaType.APPLICATION_JSON_VALUE })
+    @CrossOrigin
+    @RequestMapping(path = "/api/individuals/{id}")
     public Individual apiIndividualsLoginGetOne(
             HttpServletRequest request,
             @PathVariable("id") long id

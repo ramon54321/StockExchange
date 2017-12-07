@@ -34,8 +34,8 @@ public class ApiData {
     @Autowired
     private EntityManagerFactory emf;
 
-    @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/api/data/commodities", produces = { MediaType.APPLICATION_JSON_VALUE })
+    @CrossOrigin
+    @RequestMapping(path = "/api/data/commodities")
     public List<Commodity> apiDataListCommodities(
             HttpServletRequest request
     ) {
@@ -45,8 +45,8 @@ public class ApiData {
         return commodities;
     }
 
-    @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/api/data/commodities/{comId}/{mingap}", produces = { MediaType.APPLICATION_JSON_VALUE })
+    @CrossOrigin
+    @RequestMapping(path = "/api/data/commodities/{comId}/{mingap}")
     public OHLCPojo apiDataListCommoditiesTest(
             HttpServletRequest request,
             @PathVariable("comId") long comId,
