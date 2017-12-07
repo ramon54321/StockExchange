@@ -3,6 +3,7 @@ package com.ramonbrand.stockexchange.stockexchange.controller;
 import com.ramonbrand.stockexchange.stockexchange.model.Matcher;
 import com.ramonbrand.stockexchange.stockexchange.model.data.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,7 +35,7 @@ public class ApiData {
     private EntityManagerFactory emf;
 
     @CrossOrigin(origins = "*")
-    @RequestMapping("/api/data/commodities")
+    @RequestMapping(value = "/api/data/commodities", produces = { MediaType.APPLICATION_JSON_VALUE })
     public List<Commodity> apiDataListCommodities(
             HttpServletRequest request
     ) {
@@ -45,7 +46,7 @@ public class ApiData {
     }
 
     @CrossOrigin(origins = "*")
-    @RequestMapping("/api/data/commodities/{comId}/{mingap}")
+    @RequestMapping(value = "/api/data/commodities/{comId}/{mingap}", produces = { MediaType.APPLICATION_JSON_VALUE })
     public OHLCPojo apiDataListCommoditiesTest(
             HttpServletRequest request,
             @PathVariable("comId") long comId,

@@ -10,6 +10,7 @@ import com.ramonbrand.stockexchange.stockexchange.model.Matcher;
 import com.ramonbrand.stockexchange.stockexchange.model.PasswordVerification;
 import com.ramonbrand.stockexchange.stockexchange.model.data.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,7 +31,7 @@ public class ApiIndividuals {
     private IndividualRepository individualRepository;
 
     @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/api/individuals/login", method = RequestMethod.POST)
+    @RequestMapping(value = "/api/individuals/login", method = RequestMethod.POST, produces = { MediaType.APPLICATION_JSON_VALUE })
     public LoggedInPojo apiIndividualsLogin(
             HttpServletRequest request,
             @RequestBody SignInCombo signInCombo
@@ -61,8 +62,8 @@ public class ApiIndividuals {
     }
 
     @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/api/individuals")
-    public List<Individual> apiIndividualsLogin(
+    @RequestMapping(value = "/api/individuals", produces = { MediaType.APPLICATION_JSON_VALUE })
+    public List<Individual> apiIndividualsLoginGetAll(
             HttpServletRequest request
     ) {
         List<Individual> individuals = new ArrayList<>();
@@ -72,8 +73,8 @@ public class ApiIndividuals {
     }
 
     @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/api/individuals/{id}")
-    public Individual apiIndividualsLogin(
+    @RequestMapping(value = "/api/individuals/{id}", produces = { MediaType.APPLICATION_JSON_VALUE })
+    public Individual apiIndividualsLoginGetOne(
             HttpServletRequest request,
             @PathVariable("id") long id
     ) {
