@@ -33,7 +33,7 @@ public class ApiData {
     @Autowired
     private EntityManagerFactory emf;
 
-    @CrossOrigin
+    @CrossOrigin(origins = "*")
     @RequestMapping("/api/data/commodities")
     public List<Commodity> apiDataListCommodities(
             HttpServletRequest request
@@ -44,7 +44,7 @@ public class ApiData {
         return commodities;
     }
 
-    @CrossOrigin
+    @CrossOrigin(origins = "*")
     @RequestMapping("/api/data/commodities/{comId}/{mingap}")
     public OHLCPojo apiDataListCommoditiesTest(
             HttpServletRequest request,

@@ -22,7 +22,7 @@ public class ApiTrade {
     @Autowired
     private Matcher matcher;
 
-    @CrossOrigin
+    @CrossOrigin(origins = "*")
     @RequestMapping("/api/buy/{comId}/{price}/{qty}")
     public String apiTradeRequestBuy(
             HttpServletRequest request,
@@ -53,7 +53,7 @@ public class ApiTrade {
         return "Trade request added: BUY " + qty + " @ " + price + " of " + comId + " from " + request.getRemoteAddr() + " + " + request.getRemotePort();
     }
 
-    @CrossOrigin
+    @CrossOrigin(origins = "*")
     @RequestMapping("/api/sell/{comId}/{price}/{qty}")
     public String apiTradeRequestSell(
             HttpServletRequest request,

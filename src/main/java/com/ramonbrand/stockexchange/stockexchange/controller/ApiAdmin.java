@@ -3,6 +3,7 @@ package com.ramonbrand.stockexchange.stockexchange.controller;
 import com.ramonbrand.stockexchange.stockexchange.model.PasswordVerification;
 import com.ramonbrand.stockexchange.stockexchange.model.data.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,6 +27,7 @@ public class ApiAdmin {
     @Autowired
     private IndividualRepository individualRepository;
 
+    @CrossOrigin(origins = "*")
     @RequestMapping("/api/admin/init")
     public String apiAdminInit(
             HttpServletRequest request

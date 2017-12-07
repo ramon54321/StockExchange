@@ -29,7 +29,7 @@ public class ApiIndividuals {
     @Autowired
     private IndividualRepository individualRepository;
 
-    @CrossOrigin
+    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/api/individuals/login", method = RequestMethod.POST)
     public Object apiIndividualsLogin(
             HttpServletRequest request,
@@ -60,7 +60,7 @@ public class ApiIndividuals {
         }
     }
 
-    @CrossOrigin
+    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/api/individuals")
     public List<Individual> apiIndividualsLogin(
             HttpServletRequest request
@@ -71,7 +71,7 @@ public class ApiIndividuals {
         return individuals;
     }
 
-    @CrossOrigin
+    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/api/individuals/{id}")
     public Individual apiIndividualsLogin(
             HttpServletRequest request,
