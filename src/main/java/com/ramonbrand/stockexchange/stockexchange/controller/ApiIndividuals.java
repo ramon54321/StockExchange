@@ -31,9 +31,8 @@ public class ApiIndividuals {
     private IndividualRepository individualRepository;
 
     @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/api/individuals/login", method = RequestMethod.POST, produces = { MediaType.APPLICATION_JSON_VALUE }, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/api/individuals/login", method = RequestMethod.POST)
     public LoggedInPojo apiIndividualsLogin(
-            HttpServletRequest request,
             @RequestBody SignInCombo signInCombo
     ) {
         System.out.println("U: " + signInCombo.username);
